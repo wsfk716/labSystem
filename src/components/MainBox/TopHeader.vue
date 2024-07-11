@@ -25,12 +25,7 @@
       </el-dropdown>
     </div>
   </el-header>
-  <el-dialog
-    v-model="dialogVisible"
-    title="更新地图"
-    width="50%"
-    :before-close="handleClose"
-  >
+  <el-dialog v-model="dialogVisible" title="更新地图" width="50%">
     <el-upload
       class="upload-demo"
       drag

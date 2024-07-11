@@ -1,5 +1,6 @@
 <template>
   <div>
+    <el-button type="primary" @click="handleAddRole">新建角色</el-button>
     <el-table :data="tableData" style="width: 100%" row-key="id">
       <!-- <el-table-column prop="roleName" label="角色名称" width="180" /> -->
       <el-table-column label="角色名称">
@@ -46,7 +47,7 @@
       </el-table-column>
     </el-table>
 
-    <!-- 对话框 -->
+    <!-- 更新的对话框 -->
     <el-dialog v-model="dialogVisible" title="更新角色" width="30%">
       <el-form
         ref="updateFormRef"
@@ -75,6 +76,39 @@
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="handleConfirm"> 更新 </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 添加角色对话框，只有管理员才可以添加角色 -->
+    <el-dialog v-model="AddDialogVisible" title="新建角色" width="30%">
+      <el-form
+        ref="addRoleFormRef"
+        style="max-width: 600px"
+        :model="addRoleForm"
+        :rules="rules"
+        label-width="auto"
+        class="ruleForm"
+        status-icon
+      >
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="addRoleForm.roleName" />
+        </el-form-item>
+        <el-form-item label="角色权限" prop="rights">
+          <el-tree
+            :data="rightList"
+            :props="defaultProps"
+            show-checkbox
+            node-key="path"
+            ref="AddRoleTreeRef"
+            check-strictly
+          ></el-tree>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="AddDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleAddConfirm"> 确定 </el-button>
         </div>
       </template>
     </el-dialog>
@@ -160,6 +194,47 @@ const handleDelete = async ({ id }) => {
   await axios.delete(`/adminapi/roles/${id}`)
   dialogVisible.value = false
   await getList()
+}
+
+// 新建角色相关
+const addRoleFormRef = ref()
+const addRoleForm = ref({
+  roleName: '',
+  roleType: 2, // 角色类型默认为2，1是管理员。
+  rights: []
+})
+const AddDialogVisible = ref(false)
+// 处理添加角色
+const handleAddRole = () => {
+  AddDialogVisible.value = true
+}
+
+const AddRoleTreeRef = ref()
+// 添加角色确定提交
+const handleAddConfirm = () => {
+  // 获取选中的节点
+  const nodes = AddRoleTreeRef.value.getCheckedNodes(false, false)
+  // 遍历选中的节点，获取path,存入rights数组中
+  addRoleForm.value.rights = JSON.stringify(nodes.map((item) => item.path))
+
+  addRoleFormRef.value.validate(async (valid, fields) => {
+    if (valid) {
+      console.log(addRoleForm.value)
+      // 发送请求到后端提交数据
+      await axios.post('/adminapi/roles', addRoleForm.value)
+      AddDialogVisible.value = false
+      // 清空表单
+      addRoleForm.value = {
+        roleName: '',
+        roleType: 2,
+        rights: ''
+      }
+      // 刷新列表
+      await getList()
+    } else {
+      console.log(valid)
+    }
+  })
 }
 </script>
 

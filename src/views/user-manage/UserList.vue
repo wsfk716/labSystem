@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" @click="handleAddRole">添加用户</el-button>
+    <el-button type="primary" @click="handleAddUser">添加用户</el-button>
     <el-table :data="tableData" style="width: 100%" row-key="id">
       <!-- <el-table-column prop="roleName" label="角色名称" width="180" /> -->
       <el-table-column label="角色名称">
@@ -159,7 +159,7 @@ const rules = ref({
   roleId: [{ required: true, message: '请选择角色', trigger: 'blur' }]
 })
 
-const handleAddRole = () => {
+const handleAddUser = () => {
   dialogVisible.value = true
 }
 

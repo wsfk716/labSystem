@@ -93,7 +93,7 @@ onMounted(() => {
     }
   })
   // 给图片层绑定事件
-  imagelayer.on('mousemove', (e) => {
+  imagelayer.on('click', (e) => {
     let { lng, lat } = e.lngLat
     popup = new Popup({
       offsets: [0, 0],
